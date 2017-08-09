@@ -1,0 +1,16 @@
+[Unit]
+Description=redcdn data service
+
+[Service]
+Type=forking
+PIDFile=/opt/redcdn/bin/redfs.pid
+User=root
+TimeoutStartSec=0
+ExecStart=/opt/redcdn/bin/storage
+ExecStop=/usr/bin/kill -1 $MAINPID
+KillMode=control-group
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
