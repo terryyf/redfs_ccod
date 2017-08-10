@@ -6,16 +6,21 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	Log::open(true,(char*)"-dGMfyds",false);
-    testing::InitGoogleTest(&argc,argv);
-    for(int i=0;i<1;++i){
-        RUN_ALL_TESTS();
-        Sleep(1000);
-    }
-    getchar();
+    //testing::InitGoogleTest(&argc,argv);
+    //for(int i=0;i<1;++i){
+    //    RUN_ALL_TESTS();
+    //    Sleep(1000);
+    //}
+    //getchar();
    
-    return 0;
+    //return 0;
+	if(argc!=4){
+		printf("bad param\n");
+		getchar();
+		return 0;
+	}
 
-	UdpTester tester("127.0.0.1",600);
+	UdpTester tester(argv[1],argv[2],atoi(argv[3]));
 	bool ret = tester.start();
 	tester.test();
 	while(1){

@@ -16,11 +16,11 @@ bool UdpTester::start()
 	CPID cp_id=0,cp_id1=0;
 	AIO_ECODE ec ,ec1;
 	for (int i=0;i<m_user_num;++i){
-		ec = m_cp.add_socket(cp_id,m_udp_users[i]->m_svr_recv_addr);		
-		ec1 = m_cp.add_socket(cp_id1,m_udp_users[i]->m_svr_sent_addr);
+		ec = m_cp.add_socket(cp_id,m_udp_users[i]->m_local_recv_addr);		
+		ec1 = m_cp.add_socket(cp_id1,m_udp_users[i]->m_local_sent_addr);
 		if(AIO_SUC!=ec || AIO_SUC!=ec1){
 			printf("m_cp.add_socket ec %d m_svr_recv_addr port %d ec1 %d m_svr_sent_addr port %d",
-				ec,m_udp_users[i]->m_svr_recv_addr.m_port,ec1,m_udp_users[i]->m_svr_sent_addr.m_port);
+				ec,m_udp_users[i]->m_local_recv_addr.m_port,ec1,m_udp_users[i]->m_local_sent_addr.m_port);
 			m_cp.close_all_sockets();
 			return false;
 		}
@@ -41,11 +41,11 @@ bool UdpTester::start()
 
 void UdpTester::test()
 {
-	int dest = m_user_num/2;
-	for (int i=0;i<m_user_num/2;++i){
-		m_udp_users[i]->m_remote_addr= m_udp_users[dest+i]->m_svr_recv_addr;
-		m_udp_users[dest+i]->m_remote_addr = m_udp_users[i]->m_svr_recv_addr;
-	}
+	//int dest = m_user_num/2;
+	//for (int i=0;i<m_user_num/2;++i){
+	//	m_udp_users[i]->m_remote_addr= //m_udp_users[dest+i]->m_local_recv_addr;
+	//	m_udp_users[dest+i]->m_remote_addr = m_udp_users[i]->m_local_recv_addr;
+	//}
 
 	for(int i=0;i<m_user_num;++i){
 		m_udp_users[i]->recv_data();
@@ -55,13 +55,13 @@ void UdpTester::test()
 	}
 }
 
-UdpTester::UdpTester(string svr_ip,int user_num) :m_transfer_len(700),m_stoped(false),m_user_num(user_num)
+UdpTester::UdpTester(string local_ip,string remote_ip,int user_num) :m_transfer_len(700),m_stoped(false),m_user_num(user_num)
 {
 	m_udp_users = new UdpUser*[user_num];
 	int port = svr_base_port;
 	for (int i=0;i<user_num;++i)
 	{
-		m_udp_users[i] = new UdpUser(this,&m_cp,svr_ip.c_str(),port);
+		m_udp_users[i] = new UdpUser(this,&m_cp,local_ip.c_str(),port,remote_ip.c_str(),port+1);
 		port+=2;
 	}
 }

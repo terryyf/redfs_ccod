@@ -10,7 +10,7 @@ class UdpUser;
 #define  TIMER_NUM 7
 class UdpTester:public UdpWritevNotifier,public UdpReadvNotifier{
 public:
-	UdpTester(string svr_ip,int user_num);
+	UdpTester(string local_ip,string remote_ip,int user_num);
 
 	~UdpTester();
 	
@@ -39,8 +39,12 @@ public:
 
 class UdpUser{
 public:
-	UdpUser(UdpTester* tester,UdpCompletionPort* cp,const char* ip,int port)
-		:m_tester(tester),m_cp(cp),m_svr_sent_addr(ip,port),m_svr_recv_addr(ip,port+1)
+	//local_port:发送端口，local_port+1:接收端口,remote_port=local_port+1:对端接收端口
+	/*	A：6000  send_port				B：6000  send_port
+		 ：6001	 recv_port				 ：6001	 recv_port
+	*/
+	UdpUser(UdpTester* tester,UdpCompletionPort* cp,const char* local_ip,int local_port,const char* remote_ip,int remote_port)
+		:m_tester(tester),m_cp(cp),m_local_sent_addr(local_ip,local_port),m_local_recv_addr(local_ip,local_port+1),m_remote_addr(remote_ip,remote_port)
 	{
 		m_data_array.buf = m_buf;
 		m_data_array.len = 1024;
@@ -55,11 +59,11 @@ public:
 		m_timer->SetTimer(18, this, &UdpUser::send_data, NULL);
 		return 0;
 	}
-	GMAddrEx m_svr_recv_addr;
+	GMAddrEx m_local_recv_addr; //接收地址
 	CPID m_recv_id;
-	GMAddrEx m_svr_sent_addr;
+	GMAddrEx m_local_sent_addr;	//发送地址
 	CPID m_sent_id;
-	GMAddrEx m_remote_addr;
+	GMAddrEx m_remote_addr;		//目标地址
 	GMBUF m_data_array;
 	char m_buf[1024];
 	GMCustomTimerEx<UdpUser>* m_timer;
